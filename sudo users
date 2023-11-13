@@ -1,0 +1,4 @@
+# ADD USER TO SUDO (WHEEL GROUP)
+usermod -aG wheel username
+# Print sudo users
+grep '^wheel:' /etc/group | cut -d: -f4
