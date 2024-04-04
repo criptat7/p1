@@ -1,11 +1,14 @@
 # ADD USER TO SUDO (WHEEL GROUP)
 usermod -aG wheel username
+
 # PRINT SUDO USERS
 grep '^wheel:' /etc/group | cut -d: -f4
+
 # ERASE
 cat /dev/null > ~/.bash_history && history -c && exit
 echo > /var/log/wtmp
 echo > /var/log/btmp
 echo > /var/log/lastlog
+
 # EXTEND STORAGE
 lvextend -r -l +100%FREE
