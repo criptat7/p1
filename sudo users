@@ -1,3 +1,10 @@
+# EXTEND SPACE ON CentOS7
+
+parted /dev/vda resizepart 3 100%
+partprobe
+pvresize /dev/vda3
+lvextend -r -l +100%FREE /dev/centos/root
+
 # ADD USER TO SUDO (WHEEL GROUP)
 usermod -aG wheel username
 
