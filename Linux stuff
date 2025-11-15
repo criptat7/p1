@@ -1,0 +1,488 @@
+# EXTEND SPACE ON CentOS7
+
+parted /dev/vda resizepart 3 100%
+partprobe
+pvresize /dev/vda3
+lvextend -r -l +100%FREE /dev/centos/root
+
+# ADD USER TO SUDO (WHEEL GROUP)
+usermod -aG wheel username
+
+# PRINT SUDO USERS
+grep '^wheel:' /etc/group | cut -d: -f4
+
+# ERASE
+cat /dev/null > ~/.bash_history && history -c && exit
+echo > /var/log/wtmp
+echo > /var/log/btmp
+echo > /var/log/lastlog
+
+# EXTEND STORAGE
+lvextend -r -l +100%FREE
+
+# STORAGE scan (refresh) disk nou adaugat la vm linux
+
+echo "- - -" > /sys/class/scsi_host/host0/scan
+echo "- - -" > /sys/class/scsi_host/host1/scan
+echo "- - -" > /sys/class/scsi_host/host2/scan
+
+
+# LINUX LVM EXTEND
+
+lvextend -r -l +100%FREE
+
+
+
+# PROXY
+
+echo $http_proxy
+
+export http_proxy='http://0.0.0.0:8080'
+
+export https_proxy='http://0.0.0.0:8080'
+
+# x
+
+cat /dev/null >~/.bash_history && history -c && exit
+
+ansible_ssh_user=user   ansible_ssh_pass=password
+
+# The use of SHA-1 for signatures is restricted in the default crypto policy. Please be aware that this may cause issues using SSH to access older systems, such as RHEL/CentOS 6. To allow SHA-1 you can run:
+
+update-crypto-policies --set DEFAULT:NO-SHA1
+
+
+# ADD USER TO SUDO (WHEEL GROUP)
+
+usermod -aG wheel username
+
+
+# Print sudo users
+
+grep '^wheel:' /etc/group | cut -d: -f4
+
+
+# PermitRootLogin
+
+sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+systemctl restart sshd
+
+# Linux everything
+
+to be sorted:
+scp
+nmtui
+wget
+curl
+pushd 
+popd
+
+########################################################################
+#### FILE MANAGEMENT
+------------------------------------------------------------
+'find' search for files in a directory hierarchy
+        find /path/where/to/search -name *ceva.file
+        find /var/log -mmin -60         #afiseaza fisierele care au fost modificate in ultimele 60min
+------------------------------------------------------------
+'grep' -iRl "ceva" /path
+        -i (case sensitive ignore) 
+        -R (recursive) 
+        -l (afiseaza fisierul care cuprinde cuvantul)
+------------------------------------------------------------
+'stat' display file or file system status
+------------------------------------------------------------
+'readelf' Display information about ELF files (Executable and Linkable File Format)
+------------------------------------------------------------
+'chown' USER:GROUP FILE/FOLDER -R(ecursive)
+------------------------------------------------------------
+'chmod' 0(sticky-bit)7(user)7(group)7(everyone) 
+        (0 - no permission; 1 - execute; 2 - write; 4 - read)
+        +x (adauga execute la fisier)
+------------------------------------------------------------
+'tar' -czfv arhiva.tar.gz file1 file2 folder
+        -x (extract) 
+        -c (create)
+        -f (file) 
+        -v (verbose) 
+        -z (compress with gunzip)(gzip, gunzip, zcat - compress or expand files)
+------------------------------------------------------------
+'ls' -laSh (afiseaza fisierele in ordine dupa marime)
+------------------------------------------------------------
+'openssl' x509 -noout -in CERT -issuer -subject -dates
+        openssl s_client -connect localhost:443 2>/dev/null | openssl x509 -noout -issuer -subject -dates       #check cert on localhost
+
+openssl x509 -noout -modulus -in cert.crt | openssl md5 && openssl rsa -noout -modulus -in privkey.txt | openssl md5                  #Check md5 of key/crt if they match it means the pair is correct
+------------------------------------------------------------
+'less'  opens a file in read mode, full screen terminal
+------------------------------------------------------------
+'tail' output the last part of files
+        -f (follow)
+------------------------------------------------------------
+'head' output the first part of files
+------------------------------------------------------------
+'tree' list contents of directories in a tree-like format.
+        - ls /path/*/*/*
+------------------------------------------------------------
+'mkdir' -p(ersistent) /path/new/new/new
+------------------------------------------------------------
+rm -r(ecursive)f(orce)
+------------------------------------------------------------
+ln -s(ymlink)  FILE  /path/to/NEW-file
+------------------------------------------------------------
+du -sh * | sort -h   #Show folder/files size in order
+------------------------------------------------------------
+egrep -v "^\s*(#|$)"    #Filtrarea unui fisier de config 
+------------------------------------------------------------
+journalctl --disk-usage
+sudo journalctl --vacuum-time=3d
+------------------------------------------------------------
+#RSYNC
+        rsync [-other options] -e 'ssh -p PORT' SOURCE user@x.x.x.x:DESTINATION #Push
+        rsync [-other options] -e 'ssh -p PORT' user@x.x.x.x:SOURCE DESTINATION #Pull
+------------------------------------------------------------
+'sha512sum' compute and check SHA512 message digest
+------------------------------------------------------------
+'dd' convert and copy a file            #can be used to copy anything, suited for backup jobs for MBR, bootloader, etc
+        bs=BYTES
+------------------------------------------------------------
+'xargs' build and execute command lines from standard input             #very powerful if used with pipe
+------------------------------------------------------------
+'realpath'  print the resolved path
+------------------------------------------------------------
+########################################################################
+
+
+
+
+
+########################################################################
+#### FILESYSTEM MANAGEMENT
+------------------------------------------------------------
+'mdadm' manage MD devices aka Linux Software RAID
+        - cat /proc/mdstat (raid-ul format din mdadm)
+------------------------------------------------------------
+'lsblk' -f (listblock with filesystem type)
+------------------------------------------------------------
+'df' -hT  #disk space usage + type
+------------------------------------------------------------
+'pvdisplay', 'vgdisplay', 'lvdisplay'
+         'lvcreate' -n NAME-OF-LV -l 100%FREE VG
+------------------------------------------------------------
+'resize2fs' ext2/ext3/ext4 file system resizer
+------------------------------------------------------------
+'growpart' extend a partition in a partition table to fill available space
+------------------------------------------------------------
+'xfs_growfs' expand an XFS filesystem
+------------------------------------------------------------
+'mount' mount a filesystem
+        -a(ll) from /etc/fstab
+------------------------------------------------------------
+'cron'
+        crontab -l(ist) or -e(dit)
+        vim /etc/crontab
+------------------------------------------------------------
+'fdisk' manipulate disk partition table
+        - fdisk -l(ist)
+        - fdisk /dev/mapper/md1
+------------------------------------------------------------
+'mkfs' build a Linux filesystem
+        - mkfs.ext4 /dev/sdX
+        - mkfs.fat3
+------------------------------------------------------------
+'iostat' report Central Processing Unit (CPU) statistics and input/output statistics for devices and partitions
+        iostat -d -x 10 10      
+------------------------------------------------------------
+'sar' collect, report, or save system activity information
+        sar -dp 3 7 
+------------------------------------------------------------
+########################################################################
+
+
+
+
+
+########################################################################
+#### SYSTEM MANANAGEMENT
+------------------------------------------------------------
+'swapoff' -a(ll)v(erbose) && 'swapon' -av
+------------------------------------------------------------
+'sar' -b (I/O stats)
+------------------------------------------------------------
+'iotop' -oP (arata I/O care ruleaza) -x (extended)
+------------------------------------------------------------
+'dpkg' package manager for Debian
+        -l or --list 
+        -S or --search 
+        -I or --information
+------------------------------------------------------------
+'nginx' -t CFG (testeaza config)
+------------------------------------------------------------
+'watch' execute a program periodically, showing output fullscreen
+         -n seconds 'command'
+------------------------------------------------------------
+'screen' screen manager with VT100/ANSI terminal emulation              #very useful and powerful #LEARN!
+------------------------------------------------------------
+'tmux' terminal multiplexer             #or simply use Terminator
+########################################################################
+
+
+
+
+
+########################################################################
+#### USER MANAGEMENT
+------------------------------------------------------------
+'env' run a program in a modified environment
+        - echo $HISTFILE (for example) to see where is the file to store the history of commands
+        - export HISTFILE=/home/mpetrini/.bash_history  (to set HISTFILE to another locatin in the env of the current user)
+.bashrc is the file which is ran everytime on login of the user/terminal 
+        - the perfect place for aliases or setting the environment for a user
+------------------------------------------------------------
+'set' command can be used to set a variable in the ENV
+------------------------------------------------------------
+'last' -3
+------------------------------------------------------------
+'ssh' IP -p PORT -A (forward ssh-agent with key)
+------------------------------------------------------------
+'getent' group | 'cut' -d -f1 #afiseaza prima coloana din lista grupurilor
+------------------------------------------------------------
+'groupadd' create a new group
+        -g or --gid
+------------------------------------------------------------
+'usermod' modify a user account
+        -a(ppend)G(roups) GROUNAME,GROUPNAME2 USER
+        -g GROUPNAME USER (schimba grupul primar)
+        -L USER (lock a user)
+        -U USER (unlock)
+------------------------------------------------------------
+'useradd' 
+        -m or --create-home
+        -d or --home-dir
+        -s or --shell /bin/bash
+------------------------------------------------------------
+########################################################################
+
+
+
+
+
+
+
+########################################################################
+#### PROCESS MANAGEMENT
+------------------------------------------------------------
+'ps' -U USER
+------------------------------------------------------------
+'pwdx' PID (arata locatia procesului)
+------------------------------------------------------------
+'kill' SIGNAL PID
+------------------------------------------------------------
+'pkill' (process kill) SIGNAL PID/NAME_of_PROCESS
+------------------------------------------------------------
+'kilall' kill processes by name 
+        -l (List all known signal names)
+------------------------------------------------------------
+ps aux | grep [e]nginescand | awk '{ print $2 }' | xargs ps -o %cpu,%mem,cmd
+------------------------------------------------------------
+########################################################################
+
+
+
+
+
+
+
+ ########################################################################
+#### NETWORK MANAGEMENT
+------------------------------------------------------------
+'dhclient' Dynamic Host Configuration Protocol Client
+         - set interface as option
+------------------------------------------------------------
+iptables-save > fw
+iptables-restore < fw
+(alternative)        vim /etc/iptables/rules.v4/6
+------------------------------------------------------------
+netfilter-persistent save
+------------------------------------------------------------
+'netplan' apply (restart network adapter)
+------------------------------------------------------------
+'ip link' set enp01 up/down
+------------------------------------------------------------
+'ip' route get IP
+------------------------------------------------------------
+'telnet' IP PORT
+------------------------------------------------------------
+'netstat' Print network connections, routing tables, interface statistics, masquerade connections, and multicast memberships
+        -n or --numeric
+        -l or --listening
+        -p or --program
+        -t or --tcp
+        -u or --udp
+------------------------------------------------------------
+'host' DNS lookup utility
+------------------------------------------------------------
+'dig' DNS lookup utility
+        dig NS server.name.com  #find where is hosted
+        dig @ns.server server.name.com  #look from the hosting provider perspective
+        dig @1.1.1.1 server.name.com    #look from the internet perspective
+
+------------------------------------------------------------
+########################################################################
+
+
+
+
+
+
+
+
+
+########################################################################
+#### APPS
+------------------------------------------------------------
+MYSQL
+        mysql -u username -p
+        mysql> show databases;
+        mysql> SELECT User,Host FROM mysql.user;
+        mysql> DROP USER 'submitapp01'@'localhost';
+        mysql> CREATE USER 'submitapp01'@'81.161.59.187' IDENTIFIED BY '7RyWCuA63i';
+        mysql> GRANT ALL ON bd_submit to 'submitapp01'@'localhost' IDENTIFIED BY '7RyWCuA63i';
+        SHOW SLAVE STATUS\G
+        SHOW FULL PROCESSLIST;
+        
+------------------------------------------------------------
+POSTFIX
+        postqueue -p  | grep MAILER-DAEMON -A 3  | grep = | cut -d "=" -f 2 | cut -d @ -f 2 | cut -d "." -f 2,3 | sort | uniq -c | sort -n            #shows  unique senders with the number  
+        postqueue -p | grep MAILER-DAEMON | awk '{print$1}' | postsuper -d -            #delete differed mails from MAILER-DAEMON
+------------------------------------------------------------
+VI
+        yy - copy a line
+                p - paste the line copied
+        dd - delete a line 
+                P - paste the line deleted
+                #dd - place a number before dd to cut/delete that specific number of lines (e.g. 3dd)
+        k - move 
+        $ - to move at the end of the line
+        ^ - to move at the beggining of the line
+        h - left key
+                #h - move the specified number left (e.g. 4h is moving the cursor 4 spaces to the left)
+        j - down key
+                same as h
+        k - up key
+                same as h
+        l - right key
+                same as h
+
+        i - insert before the cursor
+        a- insert after cursor
+        o - insert below the line where the cursor is 
+        O - insert after the line where the cursor is
+        :wq or ZZ - save & quit
+------------------------------------------------------------
+########################################################################
+
+
+
+
+
+
+
+########################################################################
+#### BASICS
+------------------------------------------------------------
+'type' give information about the commands; if it is a builtin into the shell or is binary somehwere in the system 
+------------------------------------------------------------
+'which' show where is the location of the command
+------------------------------------------------------------
+'whereis' locate the binary, source, and manual page files for a command
+------------------------------------------------------------
+'cut' is used to remove sections from each line of files
+        - cut -d(delimiter) ; -f(fields) 2,3
+------------------------------------------------------------
+'wc' print newline, word, and byte counts for each file
+ ------------------------------------------------------------
+'fmt' simple optimal text formatter
+------------------------------------------------------------
+'head' output the first part of files
+        - can be used with -n option to show exact number of lines
+------------------------------------------------------------
+'nl' number lines of files
+------------------------------------------------------------
+'pr' convert text files for printing    
+        - can be used with > to put in a file the output
+------------------------------------------------------------
+'sed' stream editor for filtering and transforming text
+        - echo ciuciu | sed -e s/ciuciu/cacao/
+------------------------------------------------------------
+'sort' sort lines of text files
+------------------------------------------------------------
+'tr' translate or delete characters
+        - tr -d 'ceva'
+------------------------------------------------------------
+'uniq' report or omit repeated lines
+------------------------------------------------------------
+'watch' execute a program periodically, showing output fullscreen
+------------------------------------------------------------
+'bg' resume each suspended job jobspec in the background
+------------------------------------------------------------
+'fg' resume jobspec in the foreground, and make it the current job
+------------------------------------------------------------
+'uptime' tell how long the system has been running.
+########################################################################
+
+
+
+
+########################################################################
+#### ABBREVIATION
+------------------------------------------------------------
+WAF = Web Application Firewall (Cloudflare)
+SPF = Sender Policy Framework
+KVM Switch = Keyboard, Video, Monitor Switch
+RBL = Realtime Blackhole List, a list of IP addresses whose owners refuse to stop the proliferation of spam
+CDN =  Content Delivery Network
+MTA = Message Transfer Agent
+FIM = File Integrity Monitor (AIDE)
+------------------------------------------------------------
+########################################################################
+
+
+########################################################################
+#### Kubernetes
+------------------------------------------------------------
+Terminology:
+        - deploy(ment)
+                - blueprint for my-apps Pods
+        - node 
+                - a simple server of k8s
+        - pod 
+                - smallest unit of k8s, abstraction over container, usually 1 application per Pod
+                - each pod has an internal ip 
+        - ing(gress)
+        - rs
+        - svc (service)
+                - permanent ip address
+                - internal or external service
+                - load balancer role 
+        - c-m (config-map) is in plain text
+                - external configuration of your application
+        - secret same role as config map but is encrypted in base-64
+        - volumes
+                - can be local or remote
+        - statefulset is for stateful apps or databases
+------------------------------------------------------------
+########################################################################
+
+
+
+########################################################################
+##### FS
+------------------------------------------------------------
+       /proc/[pid]/fd/
+              This is a subdirectory containing one entry for each file
+              which the process has open, named by its file descriptor,
+              and which is a symbolic link to the actual file.  Thus, 0
+              is standard input, 1 standard output, 2 standard error,
+              and so on.
+------------------------------------------------------------
+########################################################################
