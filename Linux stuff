@@ -327,15 +327,6 @@ netfilter-persistent save
         dig @1.1.1.1 server.name.com    #look from the internet perspective
 
 ------------------------------------------------------------
-########################################################################
-
-
-
-
-
-
-
-
 
 ########################################################################
 #### APPS
@@ -379,13 +370,6 @@ VI
         O - insert after the line where the cursor is
         :wq or ZZ - save & quit
 ------------------------------------------------------------
-########################################################################
-
-
-
-
-
-
 
 ########################################################################
 #### BASICS
@@ -484,8 +468,7 @@ Terminology:
               and which is a symbolic link to the actual file.  Thus, 0
               is standard input, 1 standard output, 2 standard error,
               and so on.
-
-🔹 Sesequential Chaining (;)
+🔹 Sequential Chaining (;)
 Run commands one after another, regardless of success or failure.
 👉 mkdir testdir; cd testdir; touch file.txt
 
