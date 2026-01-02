@@ -484,5 +484,27 @@ Terminology:
               and which is a symbolic link to the actual file.  Thus, 0
               is standard input, 1 standard output, 2 standard error,
               and so on.
-------------------------------------------------------------
-########################################################################
+
+🔹 Sesequential Chaining (;)
+Run commands one after another, regardless of success or failure.
+👉 mkdir testdir; cd testdir; touch file.txt
+
+🔹 Conditional Execution – Success (&&)
+Run the next command only if the previous one succeeds.
+👉 mkdir logs && cd logs && touch error.log
+
+🔹 Conditional Execution – Failure (||)
+Run the next command only if the previous one fails.
+👉 pgrep nginx || echo "nginx is not running"
+
+🔹 Success or Failure Handling (&& + ||)
+Execute one command on success, another on failure.
+👉 gcc app.c && echo "Build success" || echo "Build failed"
+
+🔹 Pipeline (|)
+Pass the output of one command as input to another.
+👉 ps aux | grep nginx | awk '{print $2}'
+
+🔹 Redirection (>, >>)
+Send output to a file (overwrite or append).
+👉 dmesg | grep error >> system_errors.log
