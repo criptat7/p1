@@ -1,0 +1,157 @@
+File Management
+
+    tar -czf etc-bkp.tar /etc – creates a gzip compressed archive of /etc
+    tar -cjf etc-bkp.tar /etc – same as above but compressed with bzip2
+    umask -S g-wx,o=w – equivalent to umask 0035
+    usermod -aG sgrp user1000 – appends sgrp as a supplementary group for user1000
+    chown root:sgrp /sdir – changes ownership and owning group to root and sgrp
+    chmod +4000 /usr/bin/su – enables setuid on su file
+    chmod +2000 /usr/bin/write – enables setgid in write file
+    chmod +1000 /tmp – sets the sticky bit on the specified directory
+    find . -name socket -o -name pipe -exec rm '{}' \; – searches and removes all files named socket or pipe
+    find . -cmin 30 – searches for all files modified in the past 30 minutes
+    find /usr -type f -atime +100 -size -5M -user root – finds all regular files accessed more than 100 days ago, not bigger than 5MB, owned by root
+    setfacl -m u:user100:6 file1 – gives user100 read and write permissions on file1 via ACL
+    setfacl -x u:user100 file1 – removes any user100 ACL permissions for file1
+    setfacl -b file1 – resets ACL permissions for file1
+    setfacl -dm u:user100:7,u:user200:rwx projects/ – allocates default rwx permissions to user100 and user200 on projects/ dir
+    setfacl -k projects/ – deletes default ACL permissions for projects/ dir
+
+User Management
+
+    last – shows a listing of last logged in users
+    lastb – shows a listing of last unsuccessful log in/outs
+    lastlog – reports the most recent login of all users
+    who – shows who is logged in
+    w – shows who is logged in and what they are doing
+    id – prints real and effective user and group IDs
+    groups – prints the groups a user is in
+    useradd -s /sbin/nologin user99 – creates user99 account with the disability of logging in
+    passwd -x 30 -n 4 -w 10 user1 – user1 pwd expires in 30 days, cannot change for at least 4 days, warns 10 days prior to expiration
+    usermod -e 2021-12-20 user1 – sets password expiration date
+    passwd -S user1 – reports password status (expiration, etc.)
+    usermod -L user1 / passwd -l user1 – locks user1 account
+    visudo – edits the /etc/sudoers file
+    user1 ALL=(ALL) NOPASSWD: ALL – gives full root access without prompting for password
+    chown user1:dba -R dir1 – changes dir1 owner to user1 and group to dba recursively
+
+Linux Processes and Task Scheduling
+
+    ps -eo pid,nice,cmd | grep top – shows pid and nice for the top running process
+    nice -n +8 top – runs top with a lower priority (by 8)
+    renice -n -10 -p 3261 – increases the priority of process 3261 to -10
+    crontab -e – edits user crontab
+    23 8 * * * echo "Hello World" > /dev/pts/0 – prints message to terminal every day at 8:23
+    cat /var/log/cron – cron execution logs
+
+System Initialization, Message Logging and System Tuning
+
+    systemctl – shows loaded units
+    systemctl set-default multi-user – sets the default boot target
+    logger "$LOGNAME is delivering this message at $(date)" – writes custom log message to /var/log/messages
+    tuned-adm profile – lists all available system tuning profiles
+    tuned-adm active – shows current system tuning profile
+    tuned-adm recommend – lists recommended system tuning profile
+    tuned-adm profile balanced – sets system profile to balanced
+
+Storage Partitioning
+
+    lsblk – lists block devices
+    parted /dev/vdb mklabel msdos – labels a new disk as msdos
+    parted /dev/vdb print – displays disk info
+    parted /dev/vdb mkpart primary 1 101m – creates a new primary partition with size of 100MB
+    parted /dev/vdb rm 1 – removes partition 1
+
+VDO
+
+    vdo list, vdostats, lsblk – view vdo volumes
+    vdo create --name=testvdo --device=/dev/vdh --vdoLogicalSize=16G --vdoSlabSize=128M – creates new vdo volume with logical size of 16GB and slab size of 128MB
+    vdo status --name testvdo | grep -i dupl – checks if vdo volume has deduplication enabled
+    vdo disableCompression --name testvdo – disables compression on vdo volume
+
+LVM
+
+    vgs, pvs, lvs – lists volume groups, physical volumes and logical volumes
+    vgcreate vg100 /dev/vdb -s 16M – creates volume group using /dev/vdb with PE size of 16MB
+    vgdisplay vg100 – checks vg100 attributes
+    lvcreate -L 100M vg100 -n lvol0 – creates logical volume lvol0 on vg100 with 100MB
+    pvcreate /dev/vdc – initializes physical volume for use in LVM
+    vgextend vg100 /dev/vdc – extends volume group by adding a new physical volume
+    lvextend -L +200M /dev/vg100/lvol0 – expands logical volume size
+    lvreduce -L -252M /dev/vg100/lvol0 – reduces logical volume size
+    lvremove /dev/vg100/lvol0 – removes logical volume
+    vgremove vg100 – removes volume group
+    pvremove /dev/vdb /dev/vdc – uninitializes physical volumes
+
+Stratis
+
+    stratis pool create strpool /dev/vdg – creates strpool stratis pool using /dev/vdg block device
+    stratis pool add-data strpool /dev/vdh – expands the stratis pool by adding another block device
+    stratis pool destroy strpool – removes stratis pool
+
+Local File System and Swap
+
+    df -h – shows filesystem disk usage
+    du -sh /usr/bin – shows directory disk usage
+    du -sc /etc /usr/bin – shows disk usage for each directory and the sum of both
+    lsblk -f – lists block devices, shows filesystem type and UUID
+    mkfs.vfat /dev/sdd1 – initializes partition with VFAT filesystem type
+    mount -a – mounts all filesystems mentioned in fstab
+    lvextend -r -L +80M /dev/vg200/lv200 – extends local volume and its filesystem
+    stratis filesystem create strpool5 strfs5 – creates strfs5 filesystem on strpool5
+    mount -o rw /stratis/strpool5/strfs5 /strfs5 – mounts strfs5 stratis filesystem
+    mkswap /dev/vde1 – initializes partition with swap structures
+    mkswap -L swappart /dev/vde1 – applies swappart label to partition
+    swapon -a – activates all swap partitions described in fstab
+    swapon -s – lists all active swap partitions
+    Mount share on NFS client:
+        mkdir /local
+        mount 192.168.0.120:/common /local – manual mount
+        Add to /etc/fstab: 192.168.0.120:/common /local nfs _netdev 0 0 – mounts on startup
+        mount | grep local – confirms mounting success
+
+Networking (Requires NetworkManager service)
+
+    systemctl status NetworkManager – checks if enabled and active
+    nmcli d s / nmcli device show – checks presence of a new interface
+    nmcli con add type Ethernet ifname enp7s0 con-name enp7s0 ip4 172.10.10.120/24 gw4 172.10.10.1 – adds new connection
+    nmcli c s / nmcli connection show – confirms new connection status
+    ip a – confirms IP assignments
+    nmcli c down enp7s0 / nmcli c up enp7s0 – deactivates/activates connection
+    192.168.0.120 server20.example.com server20 in /etc/hosts – maps hostname to IP
+    ping -c2 server20 – sends two ping packets to server20
+
+Time Synchronization and Hostname Resolution
+
+    date, timedatectl – checks current system date and time
+    timedatectl set-ntp false – disables network time sync
+    timedatectl set-time "2021-07-08 04:30:00" – changes date and time
+    date --set 04:00 – changes time
+    systemctl status chronyd – checks if Chrony is active (preferred NTP implementation)
+    ssh-keygen -N "" -q – generates RSA keys without password, silent mode
+    ssh-copy-id server20 – copies current user’s public key to server20
+    Set PermitRootLogin no in /etc/ssh/sshd_config – disallows root login via SSH
+
+The Linux Firewall
+
+    firewall-cmd --get-default-zone – displays default zone
+    firewall-cmd --list-services --zone public – lists allowed services for zone
+    firewall-cmd --add-service http --zone public --permanent – permanently allows service for zone
+    firewall-cmd --reload – applies changes
+    firewall-cmd --add-port "8000-8005/udp" --zone trusted --permanent – permanently allows port range on trusted zone
+
+SELinux
+
+    -Z flag (id, ps, ls) – views SELinux context
+    seinfo -u – lists SELinux users (requires setools-console)
+    semanage login -l – shows mapping between Linux user and SELinux user
+    semanage port -l – lists records of the port object type
+    getenforce – displays current mode of operation
+    setenforce permissive – switches operating mode to permissive temporarily
+    restorecon -Rv dir1 – recursively restores default context on files
+    semanage port -at http_port_t -p tcp 8010 – adds port 8010 with type http_port_t and protocol tcp
+    semanage port -d -p tcp 8010 – deletes port 8010 with protocol tcp from policy
+    --preserve=context flag (cp) – preserves SELinux context for the object
+    getsebool -a / sestatus -b / semanage boolean -l – lists SELinux boolean state
+    setsebool nfs_export_all_rw 0 – temporarily sets nfs_export_all_rw boolean to off
+    setsebool -P nfs_export_all_rw 0 – persistently sets nfs_export_all_rw boolean to off
