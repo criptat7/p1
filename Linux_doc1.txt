@@ -1,5 +1,8 @@
 File Management
 
+    df -hTP
+    du -h / | sort -nr | less
+    find / -size +10M
     tar -czf etc-bkp.tar /etc – creates a gzip compressed archive of /etc
     tar -cjf etc-bkp.tar /etc – same as above but compressed with bzip2
     umask -S g-wx,o=w – equivalent to umask 0035
